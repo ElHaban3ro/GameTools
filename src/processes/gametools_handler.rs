@@ -3,6 +3,7 @@ use std::sync::mpsc::{self};
 use std::thread::{self, sleep};
 use crossbeam::channel::Receiver;
 use crossbeam::channel;
+use crate::utilities::system_utilities::SystemUtilities;
 
 use rdev::{EventType, Key, simulate};
 
@@ -57,6 +58,35 @@ impl GameToolsHandler {
 
     }
 
+    fn strat_auto_run_loop(_rx: Receiver<String>) {
+        let __rx = _rx;
+        info!("Starting Auto Run Loop.");
+
+        let configs = SystemUtilities::read_configs_json();
+        let run_key = SystemUtilities::str_to_key(configs["run_key"].as_str().unwrap());
+
+        thread::spawn(move || {
+            simulate(&EventType::KeyPress(Key::KeyW)).unwrap();
+            simulate(&EventType::KeyPress(run_key)).unwrap();
+            
+            loop {
+                let to_execute = __rx.try_recv();
+                let to_execute = match to_execute {
+                    Ok(to_execute) => to_execute,
+                    Err(_) => {
+                        "nothing".to_string()
+                    },
+                };
+
+                if to_execute == "stop" {
+                    simulate(&EventType::KeyRelease(Key::KeyW)).unwrap();
+                    simulate(&EventType::KeyRelease(run_key)).unwrap();
+                    break;
+                }
+            }
+        });
+    }
+
     fn press_key_by_miliseconds(key: Key, miliseconds: u64) {
         simulate(&EventType::KeyPress(key)).unwrap();
         sleep(time::Duration::from_millis(miliseconds));
@@ -70,18 +100,18 @@ impl GameToolsHandler {
         let _tx = tx.clone();
 
         let mut run_afk: bool = false;
+        let mut run_auto_run: bool = false;
 
         loop {
             let to_execute = self.rx.try_recv();
             let to_execute = match to_execute {
                 Ok(to_execute) => to_execute,
                 Err(_) => {
-                    sleep(time::Duration::from_millis(100));
+                    sleep(time::Duration::from_millis(300));
                     "nothing".to_string()
                 },
             };
             
-
             if to_execute == "start_afk" {
                 if !run_afk {
                     GameToolsHandler::start_anti_afk_loop(_rx.clone());
@@ -99,6 +129,23 @@ impl GameToolsHandler {
                     info!("Anti-AFK Loop Already Stopped.");
                 }
 
+            } else if to_execute == "start_auto_run" {
+                if !run_auto_run {
+                    GameToolsHandler::strat_auto_run_loop(_rx.clone());
+                    run_auto_run = true;
+                } else {
+                    _tx.send("stop".to_string()).unwrap();
+                    run_auto_run = false;
+                    info!("Auto Run Stoped.");
+                }
+            } else if to_execute == "stop_auto_run" {
+                if run_auto_run {
+                    _tx.send("stop".to_string()).unwrap();
+                    info!("Auto Run Stoped.");
+                    run_auto_run = false;
+                } else {
+                    info!("Auto Run Loop Already Stopped.");
+                }
             }
         }
     }

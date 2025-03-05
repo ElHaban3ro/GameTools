@@ -31,9 +31,10 @@ impl SystemUtilities {
         if !config_path.exists() {
             let config_object = object! {
                 "macro_start_afk": ["ControlLeft", "KeyP"],
-                "macro_stop_afk": ["ControlLeft", "KeyP"],
-                "macro_start_auto_run": ["ControlLeft", "KeyL"],
+                "macro_stop_afk": ["ControlLeft", "KeyI"],
+                "macro_start_auto_run": ["ControlLeft", "KeyK"],
                 "macro_stop_auto_run": ["ControlLeft", "KeyL"],
+                "run_key": "ShiftLeft"
             };
             
 
