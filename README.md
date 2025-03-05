@@ -26,7 +26,7 @@ These settings can be customized; see the [Configuration](#configuration) sectio
 If you're not interested in modifying or contributing to this project, you can download the latest [release](https://github.com/ElHaban3ro/GameTools/releases/tag/Release) or the latest version of GameTools for your platform:
 
 - [Linux x86-64](https://github.com/ElHaban3ro/GameTools/releases/download/Release/GameTools-Linux-x86_64)
-- Windows (coming soon)
+- [Windows x86-64](https://github.com/ElHaban3ro/GameTools/releases/download/Release/GameTools-Win-x86_64.exe)
 
 **Note:** On **Linux**, you may need to install or update the **x11** library, which enables interaction with the system's graphical environment.
 
