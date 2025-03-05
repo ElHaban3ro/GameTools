@@ -28,7 +28,7 @@ impl GameToolsHandler {
         
         thread::spawn(move || {
             loop {
-                sleep(time::Duration::from_millis(200));
+                sleep(time::Duration::from_millis(100));
 
                 let to_execute = __rx.try_recv();
             
@@ -40,7 +40,6 @@ impl GameToolsHandler {
                 };
 
                 if to_execute == "stop" {
-                    info!("Stopping Anti-AFK Loop.");
                     break;
                 }
 
@@ -78,6 +77,7 @@ impl GameToolsHandler {
                     },
                 };
 
+                sleep(time::Duration::from_millis(200));
                 if to_execute == "stop" {
                     simulate(&EventType::KeyRelease(Key::KeyW)).unwrap();
                     simulate(&EventType::KeyRelease(run_key)).unwrap();

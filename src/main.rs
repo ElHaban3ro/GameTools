@@ -18,7 +18,7 @@ fn main() {
             ]
         ).unwrap();
     SystemUtilities::clear_console();
-    info!("Initializing GameTools...");
+    info!("Initializing GameTools...\n\n\n\t\tWelcome to GameTools! 🎮\n\tget more info on gametools.oddfer.com 🕹️\n\n\n");
 
     let (tx, rx) = mpsc::channel::<String>();
     let keys_handler_tx = tx.clone();
