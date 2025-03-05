@@ -4,6 +4,8 @@ use std::thread::{self, sleep};
 use crossbeam::channel::Receiver;
 use crossbeam::channel;
 
+use rdev::{EventType, Key, simulate};
+
 pub struct GameToolsHandler {
     rx: mpsc::Receiver<String>,
 }
@@ -25,15 +27,13 @@ impl GameToolsHandler {
         
         thread::spawn(move || {
             loop {
-                info!("Anti-AFK Loop Running.");
-                sleep(time::Duration::from_secs(1));
+                sleep(time::Duration::from_millis(200));
 
                 let to_execute = __rx.try_recv();
             
                 let to_execute = match to_execute {
                     Ok(to_execute) => to_execute,
                     Err(_) => {
-                        //println!("Error: {:?}", e);
                         "nothing".to_string()
                     },
                 };
@@ -43,9 +43,24 @@ impl GameToolsHandler {
                     break;
                 }
 
+                
+                // press w by 5 seconds
+                GameToolsHandler::press_key_by_miliseconds(Key::KeyW, 200);
+                GameToolsHandler::press_key_by_miliseconds(Key::KeyS, 200);
+
+                GameToolsHandler::press_key_by_miliseconds(Key::Space, 1000);
+
+                sleep(time::Duration::from_secs(5));
+
             }
         });
 
+    }
+
+    fn press_key_by_miliseconds(key: Key, miliseconds: u64) {
+        simulate(&EventType::KeyPress(key)).unwrap();
+        sleep(time::Duration::from_millis(miliseconds));
+        simulate(&EventType::KeyRelease(key)).unwrap();
     }
 
     pub fn handler_loop(&mut self) -> () {
@@ -61,7 +76,6 @@ impl GameToolsHandler {
             let to_execute = match to_execute {
                 Ok(to_execute) => to_execute,
                 Err(_) => {
-                    //println!("Error: {:?}", e);
                     sleep(time::Duration::from_secs(2));
                     "nothing".to_string()
                 },

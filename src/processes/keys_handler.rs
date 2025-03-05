@@ -53,7 +53,13 @@ impl KeysHandler {
                 match e.event_type {
                     EventType::KeyPress(key) => {
                         if !_pressed.contains(&key) {
-                            _pressed.push(key);
+                            let configs_json = SystemUtilities::read_configs_json();
+                            let filtred_keys_start = KeysHandler::macro_vec_to_keys(configs_json["macro_start_afk"].members().map(|x| x.as_str().unwrap().to_string()).collect());
+                            let filtred_keys_stop  = KeysHandler::macro_vec_to_keys(configs_json["macro_stop_afk"].members().map(|x| x.as_str().unwrap().to_string()).collect());
+
+                            if filtred_keys_start.contains(&key) || filtred_keys_stop.contains(&key) {
+                                _pressed.push(key);
+                            }
                         }
                     },
                     EventType::KeyRelease(key) => {
