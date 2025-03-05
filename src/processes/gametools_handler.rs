@@ -76,7 +76,7 @@ impl GameToolsHandler {
             let to_execute = match to_execute {
                 Ok(to_execute) => to_execute,
                 Err(_) => {
-                    sleep(time::Duration::from_secs(2));
+                    sleep(time::Duration::from_millis(100));
                     "nothing".to_string()
                 },
             };
@@ -87,7 +87,9 @@ impl GameToolsHandler {
                     GameToolsHandler::start_anti_afk_loop(_rx.clone());
                     run_afk = true;
                 } else {
-                    info!("Anti-AFK Loop Already Running.");
+                    _tx.send("stop".to_string()).unwrap();
+                    run_afk = false;
+                    info!("Anti-AFK Stoped.");
                 }
             } else if to_execute == "stop_afk" {
                 if run_afk {
