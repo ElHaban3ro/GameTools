@@ -1,6 +1,6 @@
 mod processes;
-mod utilities;
-use processes::{keys_handler::KeysHandler, anti_afk_handler::AntiAfk};
+#[macro_use] mod utilities;
+use processes::{gametools_handler::GameToolsHandler, keys_handler::KeysHandler};
 use utilities::system_utilities::SystemUtilities;
 use std::{fs::File, sync::mpsc, thread};
 
@@ -25,12 +25,12 @@ fn main() {
 
 
     let keys_handler = KeysHandler::new(keys_handler_tx);
-    let anti_afk_handler = AntiAfk::new(rx);
+    let mut gametools_handler = GameToolsHandler::new(rx);
 
 
     // Loops Started in Threads
-    let keys_thread = thread::spawn(move || keys_handler.handler_loop(10));
-    let anti_afk_thread = thread::spawn(move || anti_afk_handler.handler_loop());
+    let keys_thread = thread::spawn(move || keys_handler.handler_loop());
+    let anti_afk_thread = thread::spawn(move || gametools_handler.handler_loop());
 
     keys_thread.join().unwrap();
     anti_afk_thread.join().unwrap();
